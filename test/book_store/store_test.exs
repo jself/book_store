@@ -166,4 +166,56 @@ defmodule BookStore.StoreTest do
       assert %Ecto.Changeset{} = Store.change_author_book(author_book)
     end
   end
+
+  describe "carts" do
+    alias BookStore.Store.Cart
+
+    import BookStore.StoreFixtures
+
+    @invalid_attrs %{}
+
+    test "list_carts/0 returns all carts" do
+      cart = cart_fixture()
+      assert Store.list_carts() == [cart]
+    end
+
+    test "get_cart!/1 returns the cart with given id" do
+      cart = cart_fixture()
+      assert Store.get_cart!(cart.id) == cart
+    end
+
+    test "create_cart/1 with valid data creates a cart" do
+      valid_attrs = %{}
+
+      assert {:ok, %Cart{} = cart} = Store.create_cart(valid_attrs)
+    end
+
+    test "create_cart/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Store.create_cart(@invalid_attrs)
+    end
+
+    test "update_cart/2 with valid data updates the cart" do
+      cart = cart_fixture()
+      update_attrs = %{}
+
+      assert {:ok, %Cart{} = cart} = Store.update_cart(cart, update_attrs)
+    end
+
+    test "update_cart/2 with invalid data returns error changeset" do
+      cart = cart_fixture()
+      assert {:error, %Ecto.Changeset{}} = Store.update_cart(cart, @invalid_attrs)
+      assert cart == Store.get_cart!(cart.id)
+    end
+
+    test "delete_cart/1 deletes the cart" do
+      cart = cart_fixture()
+      assert {:ok, %Cart{}} = Store.delete_cart(cart)
+      assert_raise Ecto.NoResultsError, fn -> Store.get_cart!(cart.id) end
+    end
+
+    test "change_cart/1 returns a cart changeset" do
+      cart = cart_fixture()
+      assert %Ecto.Changeset{} = Store.change_cart(cart)
+    end
+  end
 end

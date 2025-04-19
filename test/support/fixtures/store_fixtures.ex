@@ -47,4 +47,18 @@ defmodule BookStore.StoreFixtures do
 
     author_book
   end
+
+  @doc """
+  Generate a cart.
+  """
+  def cart_fixture(attrs \\ %{}) do
+    {:ok, cart} =
+      attrs
+      |> Enum.into(%{
+
+      })
+      |> BookStore.Store.create_cart()
+
+    cart
+  end
 end
