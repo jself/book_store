@@ -20,7 +20,11 @@ defmodule BookStoreWeb.Router do
   scope "/", BookStoreWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live_session :store_views,
+      on_mount: [{BookStoreWeb.UserAuth, :mount_current_user}] do
+      live "/", StoreLive.Listing
+      live "/book/:book_id", StoreLive.Details
+    end
   end
 
   # Other scopes may use custom stacks.

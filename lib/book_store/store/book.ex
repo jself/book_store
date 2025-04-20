@@ -5,7 +5,8 @@ defmodule BookStore.Store.Book do
   schema "books" do
     field :description, :string
     field :title, :string
-    field :isbn, :integer
+    field :price, :decimal
+    many_to_many :authors, BookStore.Store.Author, join_through: BookStore.Store.AuthorBook
 
     timestamps(type: :utc_datetime)
   end
@@ -13,7 +14,7 @@ defmodule BookStore.Store.Book do
   @doc false
   def changeset(book, attrs) do
     book
-    |> cast(attrs, [:title, :description, :isbn])
-    |> validate_required([:title, :description, :isbn])
+    |> cast(attrs, [:title, :description, :price])
+    |> validate_required([:title, :description, :price])
   end
 end

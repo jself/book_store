@@ -5,6 +5,8 @@ defmodule BookStore.Store.Author do
   schema "authors" do
     field :name, :string
 
+    many_to_many :books, BookStore.Store.Book, join_through: BookStore.Store.AuthorBook
+
     timestamps(type: :utc_datetime)
   end
 

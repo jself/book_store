@@ -12,8 +12,8 @@ defmodule BookStore.StoreFixtures do
       attrs
       |> Enum.into(%{
         description: "some description",
-        isbn: 42,
-        title: "some title"
+        title: "some title",
+        price: "19.99"
       })
       |> BookStore.Store.create_book()
 
@@ -38,10 +38,14 @@ defmodule BookStore.StoreFixtures do
   Generate a author_book.
   """
   def author_book_fixture(attrs \\ %{}) do
+    book = attrs[:book] || book_fixture()
+    author = attrs[:author] || author_fixture()
+
     {:ok, author_book} =
       attrs
       |> Enum.into(%{
-
+        book_id: book.id,
+        author_id: author.id
       })
       |> BookStore.Store.create_author_book()
 
@@ -54,9 +58,7 @@ defmodule BookStore.StoreFixtures do
   def cart_fixture(attrs \\ %{}) do
     {:ok, cart} =
       attrs
-      |> Enum.into(%{
-
-      })
+      |> Enum.into(%{})
       |> BookStore.Store.create_cart()
 
     cart

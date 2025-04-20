@@ -3,9 +3,8 @@ defmodule BookStore.Store.AuthorBook do
   import Ecto.Changeset
 
   schema "author_books" do
-
-    field :author, :id
-    field :book, :id
+    belongs_to :author, BookStore.Store.Author
+    belongs_to :book, BookStore.Store.Book
 
     timestamps(type: :utc_datetime)
   end
@@ -13,7 +12,7 @@ defmodule BookStore.Store.AuthorBook do
   @doc false
   def changeset(author_book, attrs) do
     author_book
-    |> cast(attrs, [])
-    |> validate_required([])
+    |> cast(attrs, [:author_id, :book_id])
+    |> validate_required([:author_id, :book_id])
   end
 end

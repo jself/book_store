@@ -22,6 +22,139 @@ defmodule BookStore.Store do
   end
 
   @doc """
+  Searches for books by title.
+  SQLite doesn't support ILIKE, so we use LIKE with lower() for case-insensitive search.
+
+  ## Examples
+
+      iex> search_books_by_title("harry")
+      [%Book{title: "Harry Potter"}, ...]
+
+  """
+  def search_books_by_title(search_term) when is_binary(search_term) do
+    search_pattern = "%#{String.replace(search_term, "%", "\\%")}%"
+
+    from(b in Book,
+      where: like(fragment("lower(?)", b.title), fragment("lower(?)", ^search_pattern))
+    )
+  end
+
+  @doc """
+  Searches for books by author name.
+  Returns a query that finds books with authors whose names match the search term.
+
+  ## Examples
+
+      iex> search_books_by_author("tolkien")
+      [%Book{title: "The Lord of the Rings"}, ...]
+
+  """
+  def search_books_by_author(search_term) when is_binary(search_term) do
+    search_pattern = "%#{String.replace(search_term, "%", "\\%")}%"
+
+    from(b in Book,
+      join: ab in BookStore.Store.AuthorBook, on: ab.book_id == b.id,
+      join: a in BookStore.Store.Author, on: a.id == ab.author_id,
+      where: like(fragment("lower(?)", a.name), fragment("lower(?)", ^search_pattern)),
+      distinct: true
+    )
+  end
+
+  @doc """
+  Searches for books by title or author name.
+  Returns a query that finds books where either the title or any of its authors match the search term.
+
+  ## Examples
+
+      iex> search_books("tolkien")
+      [%Book{title: "The Lord of the Rings"}, ...]
+
+  """
+  def search_books(search_term) when is_binary(search_term) do
+    title_query = search_books_by_title(search_term)
+    author_query = search_books_by_author(search_term)
+
+    from(b in Book,
+      where: b.id in subquery(
+        from b in title_query, select: b.id
+      ) or b.id in subquery(
+        from b in author_query, select: b.id
+      )
+    )
+  end
+
+  @doc """
+  Filters books with optional search by title or author and pagination.
+
+  ## Options
+    * `:search` - Optional search term to filter books by title or author (case-insensitive)
+    * `:page_size` - Number of items per page (default: 6)
+    * `:page` - Page number to fetch (default: 1)
+
+  """
+  def filter_books(opts \\ []) do
+    search = Keyword.get(opts, :search)
+    page_size = Keyword.get(opts, :page_size, 6)
+    page = Keyword.get(opts, :page, 1)
+
+    offset = (page - 1) * page_size
+
+    # Build query based on search term
+    query =
+      if search && search != "" do
+        search_books(search)
+      else
+        Book
+      end
+
+    # Get total count for pagination info
+    count_query = from(b in query, select: count(b.id))
+    total_count = Repo.one(count_query)
+
+    # Build paginated query
+    books_query =
+      from b in query,
+        limit: ^page_size,
+        offset: ^offset,
+        order_by: [asc: b.title]
+
+    books = Repo.all(books_query) |> Repo.preload(:authors)
+
+    # Calculate pagination metadata
+    page_start = offset + 1
+    page_end = min(offset + page_size, total_count)
+
+    # If no results, adjust page start/end to show 0-0
+    {page_start, page_end} =
+      if total_count == 0, do: {0, 0}, else: {page_start, page_end}
+
+    %{
+      books: books,
+      total_count: total_count,
+      page_number: page,
+      page_size: page_size,
+      has_next_page: page_end < total_count,
+      has_prev_page: page > 1,
+      page_start: page_start,
+      page_end: page_end
+    }
+  end
+
+  @doc """
+  Returns the list of books with authors preloaded.
+
+  ## Examples
+
+      iex> list_books_with_authors()
+      [%Book{authors: [%Author{}, ...]}, ...]
+
+  """
+  def list_books_with_authors do
+    Repo.all(Book)
+    |> Repo.preload(:authors)
+  end
+
+  @doc """
   Gets a single book.
 
   Raises `Ecto.NoResultsError` if the Book does not exist.
@@ -36,6 +169,25 @@ defmodule BookStore.Store do
 
   """
   def get_book!(id), do: Repo.get!(Book, id)
+
+  @doc """
+  Gets a single book with authors preloaded.
+
+  Raises `Ecto.NoResultsError` if the Book does not exist.
+
+  ## Examples
+
+      iex> get_book_with_authors!(123)
+      %Book{authors: [%Author{}, ...]}
+
+      iex> get_book_with_authors!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_book_with_authors!(id) do
+    Repo.get!(Book, id)
+    |> Repo.preload(:authors)
+  end
 
   @doc """
   Creates a book.

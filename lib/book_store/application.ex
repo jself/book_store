@@ -11,8 +11,7 @@ defmodule BookStore.Application do
       BookStoreWeb.Telemetry,
       BookStore.Repo,
       {Ecto.Migrator,
-        repos: Application.fetch_env!(:book_store, :ecto_repos),
-        skip: skip_migrations?()},
+       repos: Application.fetch_env!(:book_store, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:book_store, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: BookStore.PubSub},
       # Start the Finch HTTP client for sending emails

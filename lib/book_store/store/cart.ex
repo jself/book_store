@@ -3,7 +3,6 @@ defmodule BookStore.Store.Cart do
   import Ecto.Changeset
 
   schema "carts" do
-
     field :user, :id
     field :book, :id
 
