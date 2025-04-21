@@ -10,10 +10,38 @@
       <.live_component module={BookStoreWeb.Components.Cart} user={@current_user} id="cart" current_user={@current_user} />
       <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
         <%= if @current_user do %>
-          <li class="text-[0.8125rem] leading-6 text-zinc-900">
+          <li class="md:hidden">
+            <div id="user-dropdown-mobile" phx-hook="UserDropdownHook" class="relative inline-block text-left">
+              <button class="dropdown-toggle flex items-center space-x-1 text-zinc-900 hover:text-zinc-700">
+                <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white">
+                  <%= String.first(@current_user.email) %>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div class="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
+                  {@current_user.email}
+                </div>
+                <a href={~p"/users/settings"} class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  Settings
+                </a>
+                <.link
+                  href={~p"/users/log_out"}
+                  method="delete"
+                  class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Log out
+                </.link>
+              </div>
+            </div>
+          </li>
+          
+          <li class="hidden md:block text-[0.8125rem] leading-6 text-zinc-900">
             {@current_user.email}
           </li>
-          <li>
+          <li class="hidden md:block">
             <.link
               href={~p"/users/settings"}
               class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
@@ -21,7 +49,7 @@
               Settings
             </.link>
           </li>
-          <li>
+          <li class="hidden md:block">
             <.link
               href={~p"/users/log_out"}
               method="delete"

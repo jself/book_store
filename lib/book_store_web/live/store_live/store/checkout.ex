@@ -33,7 +33,7 @@ defmodule BookStoreWeb.StoreLive.Checkout do
 
     {:noreply,
       socket
-      |> put_flash(:info, "Order placed successfully!")
+      |> put_flash(:info, "Order placed successfully! Please check your email for confirmation and book downloads.")
       |> push_navigate(to: ~p"/")}
   end
 

@@ -40,6 +40,36 @@ Hooks.CartHook = {
   }
 }
 
+Hooks.UserDropdownHook = {
+  mounted() {
+    this.open = false
+    
+    // Toggle dropdown when clicked
+    this.el.querySelector(".dropdown-toggle").addEventListener("click", (e) => {
+      e.preventDefault()
+      this.open = !this.open
+      this.updateDropdown()
+    })
+    
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!this.el.contains(e.target) && this.open) {
+        this.open = false
+        this.updateDropdown()
+      }
+    })
+  },
+  
+  updateDropdown() {
+    const dropdown = this.el.querySelector(".dropdown-menu")
+    if (this.open) {
+      dropdown.classList.remove("hidden")
+    } else {
+      dropdown.classList.add("hidden")
+    }
+  }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,

@@ -547,9 +547,10 @@ defmodule BookStore.Store do
   @doc """
   Converts a cart to an order.
   Adds library items for books in the cart.
+  Sends a confirmation email with PDF attachments.
   """
   def convert_to_order(user_id) do
-    Repo.transaction(fn ->
+    result = Repo.transaction(fn ->
       # Get cart items
       cart_items = get_cart_items(user_id)
       total_price = Enum.reduce(cart_items, Decimal.new(0), fn cart_item, acc -> Decimal.add(acc, cart_item.book.price) end)
@@ -564,7 +565,19 @@ defmodule BookStore.Store do
 
       # Delete cart items
       delete_cart_items(user_id)
+
+      order
     end)
+
+    # Send confirmation email if the transaction was successful
+    case result do
+      {:ok, order} ->
+        user = BookStore.Accounts.get_user!(user_id)
+        BookStore.Email.send_purchase_confirmation(order, user)
+
+      _ ->
+        result
+    end
   end
 
   defp delete_cart_items(user_id) do
@@ -659,5 +672,20 @@ defmodule BookStore.Store do
       where: li.user_id == ^user_id,
       select: li.book_id)
     |> Repo.all()
+  end
+
+  @doc """
+  Gets library items for a specific order with books preloaded.
+
+  ## Examples
+
+      iex> get_library_items_for_order(order_id)
+      [%LibraryItem{book: %Book{}}, ...]
+
+  """
+  def get_library_items_for_order(order_id) do
+    from(li in LibraryItem, where: li.order_id == ^order_id)
+    |> Repo.all()
+    |> Repo.preload(:book)
   end
 end

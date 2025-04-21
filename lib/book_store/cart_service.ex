@@ -11,8 +11,9 @@ defmodule BookStore.CartService do
   end
 
   def convert_to_order(user_id) do
-    BookStore.Store.convert_to_order(user_id)
+    result = BookStore.Store.convert_to_order(user_id)
     Signals.cart_changed(user_id)
+    result
   end
 
   def get_cart_items(user_id) do

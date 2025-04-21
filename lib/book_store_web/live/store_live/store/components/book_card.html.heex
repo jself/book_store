@@ -1,4 +1,4 @@
-<div class="w-full rounded overflow-hidden shadow-lg bg-white flex flex-col justify-between">
+<div class="w-full rounded overflow-hidden shadow-lg bg-white flex flex-col h-full">
   <.link patch={~p"/book/#{@book.id}"}>
     <div class="flex flex-row justify-between px-6 py-4 bg-slate-800">
       <div class=" text-white flex flex-col">
@@ -21,10 +21,10 @@
       </div>
     </div>
   </.link>
-  <div class="flex flex-col justify-between">
+  <div class="flex flex-col flex-grow">
     <div class="p-4 flex flex-row justify-center bg-gray-100 relative">
       <%= if @book.in_library do %>
-        <div class="absolute top-2 right-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded-lg shadow">
+        <div class="absolute top-2 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white text-xs px-2 py-1 rounded-lg shadow">
           In Your Library
         </div>
       <% end %>
@@ -48,12 +48,12 @@
         </div>
       </div>
     </div>
-    <div class="p-6 grow-1">
+    <div class="p-6 flex-grow">
       <p class="text-gray-700 text-base mb-2">
         {@book.description}
       </p>
     </div>
-    <div class="px-6 py-4 border-t border-gray-200">
+    <div class="px-6 py-4 border-t border-gray-200 mt-auto">
       <div class="flex justify-between items-center">
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
           <.link patch={~p"/book/#{@book.id}"}>

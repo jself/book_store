@@ -70,7 +70,7 @@ defmodule BookStoreWeb.Components.Cart do
 
   def render(assigns) do
     ~H"""
-    <div class="relative" id="cart-dropdown-container" phx-hook="CartHook">
+    <div class="relative" id="cart-component" phx-hook="CartHook">
       <button
         phx-click="toggle_dropdown"
         phx-target={@myself}
@@ -88,7 +88,7 @@ defmodule BookStoreWeb.Components.Cart do
       </button>
 
       <%= if @show_dropdown do %>
-        <div class="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg z-50 overflow-hidden" id="cart-dropdown">
+        <div class="fixed inset-x-0 top-[4.5rem] mx-4 md:mx-0 md:absolute md:right-0 md:left-auto md:top-auto md:w-72 md:mt-2 bg-white rounded-md shadow-lg z-50 overflow-hidden" id="cart-dropdown">
           <div class="py-2 px-4 bg-gray-100 border-b border-gray-200">
             <h3 class="text-sm font-semibold">Your Cart (<%= length(@cart_items) %> items)</h3>
           </div>

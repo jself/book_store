@@ -71,6 +71,7 @@ defmodule BookStoreWeb.StoreLive.Listing do
   def handle_event("search", %{"search" => search}, socket) do
     {:noreply, socket
       |> assign(search: search)
+      |> assign(page: 1)
       |> assign_books()
     }
   end
@@ -79,6 +80,7 @@ defmodule BookStoreWeb.StoreLive.Listing do
   def handle_event("reset-search", _params, socket) do
     {:noreply, socket
       |> assign(search: nil)
+      |> assign(page: 1)
       |> assign_books()
     }
   end
