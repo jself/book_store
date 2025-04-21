@@ -56,9 +56,21 @@ defmodule BookStore.StoreFixtures do
   Generate a cart.
   """
   def cart_fixture(attrs \\ %{}) do
+    book = attrs[:book] || book_fixture()
+
+    # Create a user for the cart
+    {:ok, user} =
+      BookStore.Accounts.register_user(%{
+        email: "user#{System.unique_integer()}@example.com",
+        password: "hello world!"
+      })
+
     {:ok, cart} =
       attrs
-      |> Enum.into(%{})
+      |> Enum.into(%{
+        user_id: user.id,
+        book_id: book.id
+      })
       |> BookStore.Store.create_cart()
 
     cart

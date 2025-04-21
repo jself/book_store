@@ -3,7 +3,7 @@ defmodule BookStoreWeb.Live.Helpers.CartHelper do
   Helper functions for cart-related operations in LiveView components.
   """
 
-  import Phoenix.Component, only: [assign: 2]
+  import Phoenix.Component, only: [assign: 2, assign_new: 3]
   import Phoenix.LiveView, only: [connected?: 1, send_update: 2]
   alias BookStore.CartService
   alias BookStore.Accounts
@@ -54,15 +54,6 @@ defmodule BookStoreWeb.Live.Helpers.CartHelper do
     end
 
     socket
-  end
-
-  # Private helper to assign value to socket
-  defp assign_new(socket, key, fun) do
-    if Map.has_key?(socket.assigns, key) do
-      socket
-    else
-      assign(socket, [{key, fun.()}])
-    end
   end
 
   def item_in_cart?(user_id, book_id) when is_integer(user_id) and is_integer(book_id) do
