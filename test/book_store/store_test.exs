@@ -103,7 +103,7 @@ defmodule BookStore.StoreTest do
 
     test "filter_books/1 with pagination works correctly" do
       # Create 10 books specifically for this test
-      books = for i <- 1..10 do
+      _books = for i <- 1..10 do
         book_fixture(%{title: "Test Book #{i}", description: "Description #{i}", price: "#{10 + i}.99"})
       end
 

@@ -6,7 +6,6 @@ defmodule BookStoreWeb.Live.Helpers.CartHelper do
   import Phoenix.Component, only: [assign: 2, assign_new: 3]
   import Phoenix.LiveView, only: [connected?: 1, send_update: 2]
   alias BookStore.CartService
-  alias BookStore.Accounts
   alias BookStore.Store
 
   def assign_cart_data(socket) do

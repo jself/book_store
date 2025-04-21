@@ -1,8 +1,6 @@
 defmodule BookStoreWeb.Components.Cart do
   use BookStoreWeb, :live_component
   alias BookStore.CartService
-  alias BookStoreWeb.Live.Helpers.CartHelper
-  import Phoenix.LiveView, only: [connected?: 1, put_flash: 3]
 
   def mount(socket) do
     {:ok, assign(socket, show_dropdown: false, cart_items: [])}

@@ -7,7 +7,7 @@ defmodule BookStoreWeb.StoreLive.Listing do
   embed_templates "./components/*"
 
   @impl true
-  def mount(params, session, socket) do
+  def mount(params, _session, socket) do
     # Then use CartHelper which now uses current_user from assigns
     socket = CartHelper.assign_cart_data(socket)
 

@@ -2,7 +2,6 @@ defmodule BookStore.Email do
   import Swoosh.Email
   alias BookStore.Mailer
   alias BookStore.Store
-  alias BookStore.Accounts.User
 
   @pdf_path "priv/repo/herman-melville-moby-dick.pdf"
   @from_email "bookstore@example.com"
