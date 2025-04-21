@@ -22,7 +22,12 @@
     </div>
   </.link>
   <div class="flex flex-col justify-between">
-    <div class="p-4 flex flex-row justify-center bg-gray-100">
+    <div class="p-4 flex flex-row justify-center bg-gray-100 relative">
+      <%= if @book.in_library do %>
+        <div class="absolute top-2 right-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded-lg shadow">
+          In Your Library
+        </div>
+      <% end %>
       <div class="h-48 w-36 flex items-center justify-center bg-gray-200 rounded border border-gray-300 shadow-inner">
         <div class="text-center p-4">
           <svg
@@ -55,14 +60,28 @@
             View Details
           </.link>
         </button>
-        <%= if @in_cart do %>
-          <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Remove from Cart
-          </button>
-        <% else %>
-          <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Add to Cart
-          </button>
+        <%= cond do %>
+          <% @book.in_library -> %>
+            <div class="flex items-center bg-indigo-100 border border-indigo-300 px-3 py-2 rounded text-indigo-700 text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Owned
+            </div>
+          <% @book.in_cart -> %>
+            <button 
+              phx-click="remove_from_cart" 
+              phx-value-book_id={@book.id}
+              class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+              Remove from Cart
+            </button>
+          <% true -> %>
+            <button 
+              phx-click="add_to_cart" 
+              phx-value-book_id={@book.id}
+              class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+              Add to Cart
+            </button>
         <% end %>
       </div>
     </div>

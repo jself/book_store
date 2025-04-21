@@ -7,6 +7,8 @@ defmodule BookStore.Store do
   alias BookStore.Repo
 
   alias BookStore.Store.Book
+  alias BookStore.Store.Order
+  alias BookStore.Store.LibraryItem
 
   @doc """
   Returns the list of books.
@@ -540,5 +542,122 @@ defmodule BookStore.Store do
   """
   def change_cart(%Cart{} = cart, attrs \\ %{}) do
     Cart.changeset(cart, attrs)
+  end
+
+  @doc """
+  Converts a cart to an order.
+  Adds library items for books in the cart.
+  """
+  def convert_to_order(user_id) do
+    Repo.transaction(fn ->
+      # Get cart items
+      cart_items = get_cart_items(user_id)
+      total_price = Enum.reduce(cart_items, Decimal.new(0), fn cart_item, acc -> Decimal.add(acc, cart_item.book.price) end)
+
+      # Create order
+      order = create_order(user_id, total_price, "pending", "cash", "pending")
+
+      # Add library items for each cart item
+      for cart_item <- cart_items do
+        create_library_item(order, cart_item, user_id)
+      end
+
+      # Delete cart items
+      delete_cart_items(user_id)
+    end)
+  end
+
+  defp delete_cart_items(user_id) do
+    from(c in Cart, where: c.user_id == ^user_id)
+    |> Repo.delete_all()
+  end
+
+  @doc """
+  Gets cart items for a user with books preloaded.
+
+  ## Examples
+
+      iex> get_cart_items(user_id)
+      [%Cart{book: %Book{}}, ...]
+
+  """
+  def get_cart_items(user_id) do
+    from(c in Cart, where: c.user_id == ^user_id)
+    |> Repo.all()
+    |> Repo.preload(:book)
+  end
+
+  defp create_order(user_id, price, status, payment_method, payment_status) do
+    case %Order{user_id: user_id, total_price: price, status: status, payment_method: payment_method, payment_status: payment_status}
+    |> Order.changeset(%{})
+    |> Repo.insert() do
+      {:ok, order} -> order
+      error -> error
+    end
+  end
+
+  defp create_library_item(order, cart_item, user_id) do
+    %LibraryItem{order_id: order.id, book_id: cart_item.book_id, user_id: user_id}
+    |> LibraryItem.changeset(%{})
+    |> Repo.insert()
+  end
+
+  @doc """
+  Adds a book to the user's cart.
+
+  ## Examples
+
+      iex> add_to_cart(user_id, book_id)
+      {:ok, %Cart{}}
+
+  """
+  def add_to_cart(user_id, book_id) do
+    # Check if the cart item already exists
+    existing_cart_item =
+      from(c in Cart, where: c.user_id == ^user_id and c.book_id == ^book_id)
+      |> Repo.one()
+
+    if existing_cart_item do
+      {:ok, existing_cart_item}
+    else
+      create_cart(%{user_id: user_id, book_id: book_id})
+    end
+  end
+
+  @doc """
+  Removes a book from the user's cart.
+
+  ## Examples
+
+      iex> remove_from_cart(user_id, book_id)
+      {:ok, %Cart{}}
+
+  """
+  def remove_from_cart(user_id, book_id) do
+    cart_item =
+      from(c in Cart, where: c.user_id == ^user_id and c.book_id == ^book_id)
+      |> Repo.one()
+
+    if cart_item do
+      delete_cart(cart_item)
+    else
+      {:error, :not_found}
+    end
+  end
+
+  @doc """
+  Returns a list of book IDs that are in the user's library.
+
+  ## Examples
+
+      iex> books_in_library(user_id)
+      [1, 2, 3, ...]
+
+  """
+  def books_in_library(user_id) when is_integer(user_id) do
+    from(li in LibraryItem,
+      where: li.user_id == ^user_id,
+      select: li.book_id)
+    |> Repo.all()
   end
 end

@@ -22,10 +22,29 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
+// Hooks for LiveView
+const Hooks = {}
+
+// Cart hook for handling click-away functionality
+Hooks.CartHook = {
+  mounted() {
+    document.addEventListener("click", (e) => {
+      // If the click is outside the cart component and its dropdown
+      const cartComponent = document.getElementById("cart-component")
+      const targetEl = e.target
+      
+      if (cartComponent && !cartComponent.contains(targetEl)) {
+        this.pushEventTo("#cart-component", "close_dropdown", {})
+      }
+    })
+  }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  params: {_csrf_token: csrfToken}
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks
 })
 
 // Show progress bar on live navigation and form submits

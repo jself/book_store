@@ -16,7 +16,12 @@
 <!-- Main content with book details -->
     <div class="flex flex-col md:flex-row">
       <!-- Left side - Cover image using Open Library API or fallback -->
-      <div class="md:w-1/3 p-8">
+      <div class="md:w-1/3 p-8 relative">
+        <%= if @in_library do %>
+          <div class="absolute top-2 right-2 bg-indigo-600 text-white px-3 py-1 rounded-lg shadow z-10">
+            In Your Library
+          </div>
+        <% end %>
         <div class="bg-gray-200 rounded-lg shadow-inner flex flex-col items-center justify-center h-80">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -54,14 +59,28 @@
           </div>
 
           <div class="flex space-x-4">
-            <%= if @in_cart do %>
-              <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline transition-colors">
-                Remove from Cart
-              </button>
-            <% else %>
-              <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline transition-colors">
-                Add to Cart
-              </button>
+            <%= cond do %>
+              <% @in_library -> %>
+                <div class="flex items-center bg-indigo-100 border border-indigo-300 px-4 py-3 rounded-lg text-indigo-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span class="font-medium">In Your Library</span>
+                </div>
+              <% @in_cart -> %>
+                <button 
+                  phx-click="remove_from_cart" 
+                  phx-value-book_id={@book.id}
+                  class="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline transition-colors">
+                  Remove from Cart
+                </button>
+              <% true -> %>
+                <button 
+                  phx-click="add_to_cart" 
+                  phx-value-book_id={@book.id}
+                  class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline transition-colors">
+                  Add to Cart
+                </button>
             <% end %>
             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline transition-colors">
               <.link navigate={~p"/"}>

@@ -3,8 +3,8 @@ defmodule BookStore.Store.Cart do
   import Ecto.Changeset
 
   schema "carts" do
-    field :user, :id
-    field :book, :id
+    belongs_to :user, BookStore.Accounts.User, foreign_key: :user_id
+    belongs_to :book, BookStore.Store.Book, foreign_key: :book_id
 
     timestamps(type: :utc_datetime)
   end
@@ -12,7 +12,7 @@ defmodule BookStore.Store.Cart do
   @doc false
   def changeset(cart, attrs) do
     cart
-    |> cast(attrs, [])
-    |> validate_required([])
+    |> cast(attrs, [:user_id, :book_id])
+    |> validate_required([:user_id, :book_id])
   end
 end

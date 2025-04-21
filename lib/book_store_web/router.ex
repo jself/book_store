@@ -24,6 +24,7 @@ defmodule BookStoreWeb.Router do
       on_mount: [{BookStoreWeb.UserAuth, :mount_current_user}] do
       live "/", StoreLive.Listing
       live "/book/:book_id", StoreLive.Details
+      live "/checkout", StoreLive.Checkout
     end
   end
 

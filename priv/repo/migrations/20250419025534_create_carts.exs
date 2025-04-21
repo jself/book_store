@@ -3,13 +3,13 @@ defmodule BookStore.Repo.Migrations.CreateCarts do
 
   def change do
     create table(:carts) do
-      add :user, references(:users, on_delete: :nothing)
-      add :book, references(:books, on_delete: :nothing)
+      add :user_id, references(:users, on_delete: :nothing)
+      add :book_id, references(:books, on_delete: :nothing)
 
       timestamps(type: :utc_datetime)
     end
 
-    create index(:carts, [:user])
-    create index(:carts, [:book])
+    create index(:carts, [:user_id])
+    create index(:carts, [:book_id])
   end
 end
