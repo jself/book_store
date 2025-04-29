@@ -1,5 +1,7 @@
 # BookStore
 
+This is a sample project. It's a basic bookstore with checkout, a cart, and search.
+
 To start your Phoenix server:
 
   * Run `mix setup` to install and setup dependencies
